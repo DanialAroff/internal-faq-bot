@@ -1,0 +1,21 @@
+{
+  "name": "artaka",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "faq"
+  ],
+  "license": "ISC",
+  "author": "Danial Harith",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "dependencies": {
+    "fetch": "^1.1.0",
+    "fs": "^0.0.1-security",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  }
+}
