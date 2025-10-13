@@ -61,43 +61,46 @@ export async function tagSingleFile(filePath, db) {
   ? `File path: ${filePath}\n\nHere is part of its content:\n${content}\n\nGenerate 3 short tags and a short description for what this file is about.`
   : `Generate 3 short tags and a short description for this file: ${filePath}`;
 
-  const response = await fetch(LM_STUDIO_API, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: process.env.AUTH_TOKEN,
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPTS.tagger },
-        { role: "user", content: `${input}\n\n${noCodeFence}`}
-      ],
-    }),
-    signal: AbortSignal.timeout(600000)
-  });
-
-  const data = await response.json();
-  const output = data.choices?.[0]?.message?.content.trim();
-  if (!output) {
-    console.warn("⚠️ No content returned by the model.");
-    return;
-  }
-
-  const cleaned = sanitize(output);
-
   try {
-    const parsed = JSON.parse(cleaned);
-    // console.log(parsed);
-    const entry = ["file", path.basename(filePath), filePath, JSON.stringify(parsed.tags), parsed.description];
-    console.log(entry);
-    // await db.run(
-    //   `INSERT INTO knowledge_items (type, title, path, tags, description)
-    //    VALUES (?, ?, ?, ?, ?)`,
-    //   entry
-    // )
+    const response = await fetch(LM_STUDIO_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: process.env.AUTH_TOKEN,
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPTS.tagger },
+          { role: "user", content: `${input}\n\n${noCodeFence}`}
+        ],
+      }),
+    });
+  
+    const data = await response.json();
+    const output = data.choices?.[0]?.message?.content.trim();
+    if (!output) {
+      console.warn("⚠️ No content returned by the model.");
+      return;
+    }
+  
+    const cleaned = sanitize(output);
+  
+    try {
+      const parsed = JSON.parse(cleaned);
+      // console.log(parsed);
+      const entry = ["file", path.basename(filePath), filePath, JSON.stringify(parsed.tags), parsed.description];
+      console.log(entry);
+      // await db.run(
+      //   `INSERT INTO knowledge_items (type, title, path, tags, description)
+      //    VALUES (?, ?, ?, ?, ?)`,
+      //   entry
+      // )
+    } catch (err) {
+      console.error("❌ Failed to insert into DB:", err.message);
+      console.log("Raw output:", cleaned);
+    }
   } catch (err) {
-    console.error("❌ Failed to insert into DB:", err.message);
-    console.log("Raw output:", cleaned);
+    console.error(err);
   }
 }
