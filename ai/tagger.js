@@ -7,19 +7,12 @@ import path from "path";
 import { extractFileContent } from "../utils/extractContent.js";
 
 const LM_STUDIO_API = process.env.LM_API_URL;
-// const MODEL = "qwen3-1.7b";
-const MODEL = "qwen/qwen3-4b-thinking-2507";
+const TAGGER_MODEL = process.env.TAGGER_MODEL;
 
 export async function tagItem(item) {
   const db = await getDb();
   let filesToTag = [];
 
-  // try {
-  //   fs.accessSync(item, fs.constants.R_OK);
-  //   console.log("Readable");
-  // } catch (err) {
-  //   console.log("Unreadable");
-  // }
   if (Array.isArray(item)) {
     filesToTag = item.filter(fs.existsSync);
   } else if (fs.existsSync(item)) {
@@ -58,7 +51,7 @@ export async function tagSingleFile(filePath, db) {
 
   const content = await extractFileContent(filePath);
   const input = content
-  ? `File path: ${filePath}\n\nHere is part of its content:\n${content}\n\nGenerate 3 short tags and a short description for what this file is about.`
+  ? `File path: ${filePath}\n\nHere is part of its content:\n${content}\n\nGenerate 5 short tags and a short description for what this file is about.`
   : `Generate 3 short tags and a short description for this file: ${filePath}`;
 
   try {
@@ -69,10 +62,10 @@ export async function tagSingleFile(filePath, db) {
         Authorization: process.env.AUTH_TOKEN,
       },
       body: JSON.stringify({
-        model: MODEL,
+        model: TAGGER_MODEL,
         messages: [
           { role: "system", content: SYSTEM_PROMPTS.tagger },
-          { role: "user", content: `${input}\n\n${noCodeFence}`}
+          { role: "user", content: `${input}\n\n${noCodeFence} ${noThink}`}
         ],
       }),
     });
@@ -88,7 +81,6 @@ export async function tagSingleFile(filePath, db) {
   
     try {
       const parsed = JSON.parse(cleaned);
-      // console.log(parsed);
       const entry = ["file", path.basename(filePath), filePath, JSON.stringify(parsed.tags), parsed.description];
       console.log(entry);
       // await db.run(

@@ -7,9 +7,7 @@ dotenv.config();
 
 const LM_STUDIO_API = process.env.LM_API_URL;
 const MODEL_8B = "qwen/qwen3-8b";
-// const MODEL = "qwen/qwen3-4b-2507";
-// const MODEL = "qwen3-1.7b";
-const MODEL = "qwen3-0.6b";
+const ROUTER_MODEL = process.env.ROUTER_MODEL || "qwen3-0.6b";
 
 export async function ask(prompt) {
   const response = await fetch(LM_STUDIO_API, {
@@ -19,7 +17,7 @@ export async function ask(prompt) {
       Authorization: process.env.AUTH_TOKEN,
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: ROUTER_MODEL,
       messages: [
         {
           role: "system",
@@ -47,8 +45,9 @@ export async function ask(prompt) {
     console.warn("No content returned by the model.");
     return null;
   }
-  console.log(sanitize(output));
-  return output ? sanitize(output) : null;
+  const sanitizedOutput = sanitize(output);
+  console.log(sanitizedOutput);
+  return output ? sanitizedOutput : null;
 }
 
 export async function takeAction(output) {

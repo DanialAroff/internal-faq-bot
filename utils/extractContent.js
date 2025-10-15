@@ -13,8 +13,9 @@ export async function extractFileContent(filePath) {
     }
 
     if (ext === "pdf") {
-      const data = await PDFParse(fs.readFileSync(filePath));
-      return data.text.slice(0, 2000);
+      const parser = new PDFParse(new Uint8Array(fs.readFileSync(filePath)));
+      const content = await parser.getText();
+      return content.text.slice(0, 2000);
     }
 
     if (ext === "docx") {
