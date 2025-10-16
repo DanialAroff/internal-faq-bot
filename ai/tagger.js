@@ -12,6 +12,7 @@ const TAGGER_MODEL = process.env.TAGGER_MODEL;
 const VL_TAGGER_MODEL = process.env.VL_TAGGER_MODEL;
 const NO_OF_TAGS_READ_CONTENT = 5;
 const NO_OF_TAGS_NAME_ONLY = 3; // if tags are to be generated based on file name only
+const TAGGER_ENDPOINT = "http://127.0.0.1:8082/v1/completions";
 
 export async function tagItem(item, userDescription = "") {
   const db = await getDb();
@@ -62,8 +63,11 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
   const content = await extractFileContent(filePath);
 
   const ext = extension(filePath);
-  const isImage = ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "webp";
-  const imageBase64 = isImage ? fs.readFileSync(filePath).toString("base64") : null;
+  const isImage =
+    ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "webp";
+  const imageBase64 = isImage
+    ? fs.readFileSync(filePath).toString("base64")
+    : null;
 
   const hasDesc = Boolean(userDescription && userDescription.trim());
   const baseInput = content
@@ -74,7 +78,7 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
     : `${baseInput}\n- Generate a short description of what this file about.`;
 
   try {
-    const response = await fetch(LM_STUDIO_API, {
+    const response = await fetch(TAGGER_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,12 +88,18 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
         model: isImage ? VL_TAGGER_MODEL : TAGGER_MODEL,
         messages: [
           { role: "system", content: SYSTEM_PROMPTS.tagger },
-          { 
+          {
             role: "user",
-            content: isImage ? [
-              { type: "text", text: `${input}\n\n${noThink}`},
-              { type: "image_url", image_url: { url : `data:image/jpeg;base64,${imageBase64}`} }
-            ] : `${input}\n\n${noCodeFence} ${noThink}` },
+            content: isImage
+              ? [
+                  { type: "text", text: `${input}\n\n${noThink}` },
+                  {
+                    type: "image_url",
+                    image_url: { url: `data:image/jpeg;base64,${imageBase64}` },
+                  },
+                ]
+              : `${input}\n\n${noCodeFence} ${noThink}`,
+          },
         ],
       }),
     });
@@ -106,7 +116,9 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
     try {
       const parsed = JSON.parse(cleaned);
       console.log(parsed);
-      const embedding = await createEmbedding(parsed.description);
+      const embedding = await createEmbedding(
+        `${parsed.description}. Filename: ${path.basename(filePath)}`
+      );
       const entry = [
         "file",
         path.basename(filePath),
@@ -115,17 +127,17 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
         parsed.description,
         Buffer.from(new Float32Array(embedding).buffer),
       ];
-      // console.log(entry);
+
       // await db.run(
       //   `INSERT INTO knowledge_items (type, title, path, tags, description, embedding)
       //    VALUES (?, ?, ?, ?, ?, ?)`,
       //   entry
-      // )
+      // );
     } catch (err) {
       console.error("❌ Failed to insert into DB:", err.message);
       console.log("Raw output:", cleaned);
     }
   } catch (err) {
-    console.error(err);
+    console.error("❌ Failed to tag file", err);
   }
 }

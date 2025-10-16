@@ -8,20 +8,19 @@ dotenv.config();
 const LM_STUDIO_API = process.env.LM_API_URL;
 const MODEL_8B = "qwen/qwen3-8b";
 const ROUTER_MODEL = process.env.ROUTER_MODEL || "qwen3-0.6b";
+const ROUTER_ENDPOINT = "http://127.0.0.1:8080/v1/chat/completions"
 
 export async function ask(prompt) {
   if (!ROUTER_MODEL.includes('qwen')) {
     prompt = removeNoThink(prompt);
   }
   console.log(prompt);
-  const response = await fetch(LM_STUDIO_API, {
+  const response = await fetch(ROUTER_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: process.env.AUTH_TOKEN,
     },
     body: JSON.stringify({
-      model: ROUTER_MODEL,
       messages: [
         {
           role: "system",
@@ -45,9 +44,10 @@ export async function ask(prompt) {
   }
 
   const output = data.choices?.[0]?.message?.content?.trim();
+  console.log(data.choices?.[0]);
   if (!output) {
     console.warn("No content returned by the model.");
-    return null;
+    return { action: null };
   }
   const sanitizedOutput = sanitize(output);
   console.log(sanitizedOutput);
@@ -63,8 +63,12 @@ export async function takeAction(output) {
       await tagItem(info.target, info.description);
       break;
     case 'search_knowledge':
-      const { searchKnowledge } = await import("./searcher.js");
-      await searchKnowledge(info.query);
+      const { searchSimilar } = await import("./searcher.js");
+      await searchSimilar(info.query);
+      break;
+    case 'save_knowledge':
+      // const { saveKnowledgeEntry } = await import("./saveknowledge.js");
+      // await saveKnowledgeEntry();
       break;
     default:
       console.warn("⚠️  Unknown action:", info.action);

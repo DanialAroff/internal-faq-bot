@@ -10,6 +10,7 @@ You are a **tagger** for a local AI assistant that generate tags and short descr
 5. If user provides their own description, include it as `"description"` in the output. THE DESCRIPTION MUST BE EXACTLY AS USER PROVIDED.
 6. Tags must be LOWERCASE, NO SPACES, NO special characters except hyphen (-) and underscore (_).
 7. Amount of tags MUST BE according to user request. If user does not specify, generate 3 tags.
+8. If the file name is descriptive enough, you can use as part of description.
 
 ## Sample of CORRECT output: No spaces but underscore/hyphen
 {

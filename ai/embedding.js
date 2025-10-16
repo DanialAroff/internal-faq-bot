@@ -1,9 +1,10 @@
 const LM_STUDIO_API = process.env.LM_EMBEDDING_URL;
 const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL;
+const EMBEDDING_ENDPOINTS = 'http://127.0.0.1:8081/v1/embeddings'
 
 export async function createEmbedding(text) {
   try {
-    const response = await fetch(LM_STUDIO_API, {
+    const response = await fetch(EMBEDDING_ENDPOINTS, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
