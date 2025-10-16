@@ -1,7 +1,7 @@
 import { SYSTEM_PROMPTS } from "../data/prompts.js";
 import { noCodeFence, noThink } from "../data/rules.js";
 import { getDb } from "../utils/db.js";
-import { sanitize } from "../utils/utils.js";
+import { extension, sanitize } from "../utils/utils.js";
 import fs from "fs";
 import path from "path";
 import { extractFileContent } from "../utils/extractContent.js";
@@ -9,6 +9,7 @@ import { createEmbedding } from "./embedding.js";
 
 const LM_STUDIO_API = process.env.LM_API_URL;
 const TAGGER_MODEL = process.env.TAGGER_MODEL;
+const VL_TAGGER_MODEL = process.env.VL_TAGGER_MODEL;
 const NO_OF_TAGS_READ_CONTENT = 5;
 const NO_OF_TAGS_NAME_ONLY = 3; // if tags are to be generated based on file name only
 
@@ -59,6 +60,11 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
   }
 
   const content = await extractFileContent(filePath);
+
+  const ext = extension(filePath);
+  const isImage = ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "webp";
+  const imageBase64 = isImage ? fs.readFileSync(filePath).toString("base64") : null;
+
   const hasDesc = Boolean(userDescription && userDescription.trim());
   const baseInput = content
     ? `File path: ${filePath}\n\nHere is part of its content:\n${content}\n\nBased on above content:\n- Generate ${NO_OF_TAGS_READ_CONTENT} short tags`
@@ -75,10 +81,15 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
         Authorization: process.env.AUTH_TOKEN,
       },
       body: JSON.stringify({
-        model: TAGGER_MODEL,
+        model: isImage ? VL_TAGGER_MODEL : TAGGER_MODEL,
         messages: [
           { role: "system", content: SYSTEM_PROMPTS.tagger },
-          { role: "user", content: `${input}\n\n${noCodeFence} ${noThink}` },
+          { 
+            role: "user",
+            content: isImage ? [
+              { type: "text", text: `${input}\n\n${noThink}`},
+              { type: "image_url", image_url: { url : `data:image/jpeg;base64,${imageBase64}`} }
+            ] : `${input}\n\n${noCodeFence} ${noThink}` },
         ],
       }),
     });
@@ -105,11 +116,11 @@ export async function tagSingleFile(filePath, db, userDescription = "") {
         Buffer.from(new Float32Array(embedding).buffer),
       ];
       // console.log(entry);
-      await db.run(
-        `INSERT INTO knowledge_items (type, title, path, tags, description, embedding)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        entry
-      )
+      // await db.run(
+      //   `INSERT INTO knowledge_items (type, title, path, tags, description, embedding)
+      //    VALUES (?, ?, ?, ?, ?, ?)`,
+      //   entry
+      // )
     } catch (err) {
       console.error("❌ Failed to insert into DB:", err.message);
       console.log("Raw output:", cleaned);

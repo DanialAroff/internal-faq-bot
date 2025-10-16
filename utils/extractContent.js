@@ -2,10 +2,11 @@ import fs from "fs";
 import mammoth from "mammoth";
 import { PDFParse } from "pdf-parse";
 import xlsx from "xlsx";
+import { extension } from "./utils.js";
 
 export async function extractFileContent(filePath) {
   // Get the file extension
-  const ext = filePath.split(".").pop().toLowerCase();
+  const ext = extension(filePath);
 
   try {
     if (ext === "txt" || ext === "md" || ext === "csv") {
