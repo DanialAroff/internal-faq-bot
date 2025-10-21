@@ -14,6 +14,7 @@ export const removeNoThink = (text) =>
 export function toBuffer(array) {
   return Buffer.from(new Float32Array(array).buffer);
 }
+
 export function fromBuffer(buffer) {
   return Array.from(
     new Float32Array(
@@ -22,4 +23,20 @@ export function fromBuffer(buffer) {
       buffer.byteLength / Float32Array.BYTES_PER_ELEMENT
     )
   );
+}
+
+/**
+ * Calculate cosine similarity between two vectors
+ * @param {Array<number>} a - First vector
+ * @param {Array<number>} b - Second vector
+ * @returns {number} - Similarity score between 0 and 1
+ */
+export function cosineSim(a, b) {
+  let dot = 0, magA = 0, magB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    magA += a[i] * a[i];
+    magB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(magA) * Math.sqrt(magB));
 }
