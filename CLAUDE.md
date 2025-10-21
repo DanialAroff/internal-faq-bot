@@ -4,7 +4,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Artaka is an AI-powered knowledge management system that tags, indexes, and searches files using embeddings and vector similarity. It uses a router-based architecture where user prompts are parsed to determine actions (tag files, search knowledge, or save knowledge entries).
+Artaka is an AI-powered knowledge management system that tags, indexes, and searches files using embeddings and vector similarity. It uses a router-based architecture where user prompts are parsed to determine actions.
+
+**Status:** All core features complete! ✅
+- Tag files, search knowledge, save/update/delete entries
+- Two-stage deduplication, retry logic, error handling
+- CLI interface, distribution ready
+
+## 📚 Documentation Structure
+
+**For comprehensive information, check these first (in docs/core/):**
+
+1. **API.md** - Complete function reference
+   - All modules and functions documented
+   - Parameters, returns, examples
+   - Environment variables reference
+   - **Use this for:** Function signatures, what modules do
+
+2. **ARCHITECTURE.md** - System design and data flow
+   - High-level architecture diagrams
+   - How each operation flows through the system
+   - Database schema, embedding system
+   - Design patterns used
+   - **Use this for:** Understanding how things connect
+
+3. **DECISIONS.md** - Why things are built this way
+   - 12+ architecture decisions documented
+   - Rationale, trade-offs, alternatives considered
+   - **Use this for:** Understanding "why" not just "what"
+
+4. **DISTRIBUTION.md** - How to package and distribute
+   - Build executables, release process
+   - **Use this for:** Packaging and deployment
+
+**Only read code files when:**
+- Docs don't have the answer
+- Checking implementation details
+- Making code changes
+- Debugging specific issues
 
 ## Running the Application
 

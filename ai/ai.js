@@ -93,6 +93,18 @@ export async function takeAction(output) {
         const { updateKnowledgeByTitle } = await import("./updater.js");
         await updateKnowledgeByTitle(info.title, info.updates);
         break;
+      case "delete_file":
+        const { deleteFile } = await import("./deleter.js");
+        await deleteFile(info.target);
+        break;
+      case "delete_knowledge":
+        const { deleteKnowledgeByTitle } = await import("./deleter.js");
+        await deleteKnowledgeByTitle(info.title);
+        break;
+      case "cleanup_orphaned":
+        const { cleanupOrphaned } = await import("./deleter.js");
+        await cleanupOrphaned();
+        break;
       default:
         console.warn("⚠️  Unknown action:", info.action);
         break;

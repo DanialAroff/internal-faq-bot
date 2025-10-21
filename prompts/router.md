@@ -48,6 +48,29 @@ For updating existing knowledge, output MUST have:
 
 Use when: update, edit, modify existing knowledge
 
+## delete_file Action
+
+For deleting file from index, output MUST have:
+1. `"action":"delete_file"`
+2. `"target":"path\\to\\file"` (escape slashes!)
+
+Use when: remove, delete file from database
+
+## delete_knowledge Action
+
+For deleting knowledge entry, output MUST have:
+1. `"action":"delete_knowledge"`
+2. `"title":"entry title to delete"`
+
+Use when: remove, delete knowledge entry
+
+## cleanup_orphaned Action
+
+For cleaning up files that no longer exist on disk:
+1. `"action":"cleanup_orphaned"`
+
+Use when: cleanup, clean orphaned files, remove missing files
+
 ## Examples
 
 Input: Tag all files in D:\\Misc\\Memory
@@ -88,6 +111,24 @@ Output: {"action":"update_knowledge","title":"Restart backend","updates":{"conte
 
 Input: Edit deployment docs to add new step
 Output: {"action":"update_knowledge","title":"deployment docs","updates":{"content":"add new step here"}}
+
+Input: Delete D:\\old-file.pdf
+Output: {"action":"delete_file","target":"D:\\old-file.pdf"}
+
+Input: Remove C:\\Users\\User\\document.txt from index
+Output: {"action":"delete_file","target":"C:\\Users\\User\\document.txt"}
+
+Input: Delete "Old Procedure" knowledge entry
+Output: {"action":"delete_knowledge","title":"Old Procedure"}
+
+Input: Remove deployment docs
+Output: {"action":"delete_knowledge","title":"deployment docs"}
+
+Input: Cleanup orphaned files
+Output: {"action":"cleanup_orphaned"}
+
+Input: Clean up missing files
+Output: {"action":"cleanup_orphaned"}
 
 Input: What is the tallest mountain?
 Output: {"action":"unrelated","reason":"general knowledge question"}
