@@ -1,17 +1,47 @@
 {
   "name": "artaka",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI-powered knowledge management - Tag files, search knowledge, save notes. All local, privacy-first.",
   "keywords": [
-    "faq"
+    "knowledge-management",
+    "ai",
+    "tagging",
+    "semantic-search",
+    "embeddings",
+    "local-first",
+    "privacy"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "author": "Danial Harith",
   "type": "module",
   "main": "index.js",
-  "scripts": {
-    "test": "test"
+  "bin": {
+    "artaka": "./cli.js"
   },
+  "scripts": {
+    "start": "node cli.js",
+    "build": "pkg . --targets node18-win-x64,node18-macos-x64,node18-linux-x64 --out-path dist",
+    "build:win": "pkg . --targets node18-win-x64 --out-path dist",
+    "build:mac": "pkg . --targets node18-macos-x64 --out-path dist",
+    "build:linux": "pkg . --targets node18-linux-x64 --out-path dist"
+  },
+  "pkg": {
+    "assets": [
+      "prompts/**/*",
+      "data/**/*",
+      "node_modules/sqlite3/**/*"
+    ],
+    "outputPath": "dist"
+  },
+  "files": [
+    "ai/",
+    "utils/",
+    "data/",
+    "prompts/",
+    "cli.js",
+    "index.js",
+    ".env.example"
+  ],
   "dependencies": {
     "dotenv": "^17.2.3",
     "fetch": "^1.1.0",
@@ -21,5 +51,8 @@
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
   }
 }
