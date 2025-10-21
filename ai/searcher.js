@@ -1,19 +1,6 @@
 import { createEmbedding } from "./embedding.js";
-import { fromBuffer } from "../utils/utils.js";
+import { fromBuffer, cosineSim } from "../utils/utils.js";
 import { getDb } from "../utils/db.js";
-
-function cosineSim(a, b) {
-  let dot = 0,
-    magA = 0,
-    magB = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    magA += a[i] * a[i];
-    magB += b[i] * b[i];
-  }
-
-  return dot / (Math.sqrt(magA) * Math.sqrt(magB));
-}
 
 export async function searchSimilar(query, topK = 5) {
   const queryVector = await createEmbedding(query);
@@ -37,6 +24,6 @@ export async function searchSimilar(query, topK = 5) {
   }
 
   results.sort((a, b) => b.score - a.score);
-  console.log(results.slice(0, topK).filter(res => res.score > 0.4));
+  console.log(results.slice(0, topK).filter(res => res.score > process.env.SIMILARITY_THRESHOLD || 0.4));
   return results.slice(0, topK);
 }
