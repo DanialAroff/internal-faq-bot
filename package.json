@@ -43,14 +43,16 @@
     ".env.example"
   ],
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "fetch": "^1.1.0",
     "fs": "^0.0.1-security",
     "mammoth": "^1.11.0",
     "pdf-parse": "^2.2.16",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "pkg": "^5.8.1"
