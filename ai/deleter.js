@@ -64,7 +64,7 @@ export async function deleteKnowledge(id) {
 }
 
 /**
- * Delete knowledge entry by title
+ * Delete knowledge entry by title. Case insensitive.
  *
  * @param {string} title - Entry title
  * @returns {Promise<Object>} - Delete result
