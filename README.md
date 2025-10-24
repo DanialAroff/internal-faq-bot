@@ -286,12 +286,4 @@ Built with:
 
 ---
 
-## 📞 Support
-
-- Issues: [GitHub Issues](https://github.com/yourusername/artaka/issues)
-- Docs: See `docs/` folder
-- Examples: See `.env.example` and usage section
-
----
-
-**Artaka** - Your personal AI knowledge companion. Made with ❤️ by Danial Harith.
+**Artaka** - Your personal AI knowledge companion. Made by Danial Harith.
